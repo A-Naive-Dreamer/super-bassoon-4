@@ -74,15 +74,17 @@ module.exports = {
     deleteOne: async (req, res) => {
         try {
             await Todos
-                .update({
-                    status: 'deleted'
-                },
+                .update(
+                    {
+                        status: 'deleted'
+                    },
                     {
                         where: {
                             id: parseInt(req.params.id),
                             userId: parseInt(req.params.userId)
                         }
-                    })
+                    }
+                )
                 .then(result => {
                     Todos
                         .findAll({
@@ -92,7 +94,7 @@ module.exports = {
                         })
                         .then(result2 => {
                             res.send({
-                                message: 'Data is successfully updated.',
+                                message: 'Data is successfully deleted.',
                                 data: result2
                             })
                         })
@@ -121,7 +123,7 @@ module.exports = {
                         })
                         .then(result2 => {
                             res.send({
-                                message: 'Data is successfully updated.',
+                                message: 'Data is successfully added.',
                                 data: result2
                             })
                         })

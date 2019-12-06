@@ -3,7 +3,8 @@ const {
     DATABASE_NAME,
     DATABASE_HOST,
     DATABASE_USER,
-    DATABASE_PASSWORD
+    DATABASE_PASSWORD,
+    JWT_SECRET_KEY
 } = require('./environment')
 
 module.exports = {
@@ -11,5 +12,6 @@ module.exports = {
     DATABASE_NAME,
     DATABASE_HOST,
     DATABASE_USER,
-    DATABASE_PASSWORD
+    DATABASE_PASSWORD,
+    JWT_SECRET_KEY
 }

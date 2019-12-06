@@ -1,5 +1,12 @@
 const { Users } = require('../../db/models'),
-    Op = require('sequelize').Op
+    {
+        hashPassword,
+        comparePassword
+    } = require('../../helpers'),
+    {
+        JWT_SECRET_KEY
+    } = require('../../config'),
+    jwt = require('jsonwebtoken')
 
 module.exports = {
     getAll: async (req, res) => {
@@ -17,49 +24,45 @@ module.exports = {
     login: async (req, res) => {
         try {
             await Users
-                .findAll(
-                    {
-                        where: {
-                            [Op.and]: [
-                                {
-                                    email: req.body.email
-                                },
-                                {
-                                    password: req.body.password
-                                }
-                            ]
-                        }
-                    }
-                )
-                .then(result => {
+                .findAll({
+                    where: {
+                        email: req.body.email
+                    },
+                    attributes: [
+                        'id',
+                        'firstName',
+                        'lastName',
+                        'password'
+                    ]
+                })
+                .then(async result => {
                     if (result.length > 0) {
-                        Users
-                            .findAll(
+                        const decision = await comparePassword(req.body.password, result[0].password),
+                            id = result[0].id,
+                            firstName = result[0].firstName,
+                            lastName = result[0].lastName
+
+                        if (decision) {
+                            const token = await jwt.sign(
                                 {
-                                    where: {
-                                        [Op.and]: [
-                                            {
-                                                email: req.body.email
-                                            },
-                                            {
-                                                password: req.body.password
-                                            }
-                                        ]
-                                    },
-                                    attributes: [
-                                        'id',
-                                        'firstName',
-                                        'lastName'
-                                    ]
+                                    id,
+                                    firstName,
+                                    lastName
+                                },
+                                JWT_SECRET_KEY,
+                                {
+                                    expiresIn: '1d'
                                 }
                             )
-                            .then(result2 => {
-                                res.send({
-                                    id: result2[0].id,
-                                    firstName: result2[0].firstName,
-                                    lastName: result2[0].lastName
-                                })
+
+                            res.send({
+                                token
                             })
+                        } else {
+                            res.send({
+                                message: 'Email or password is wrong!'
+                            })
+                        }
                     } else {
                         res.send({
                             message: 'Email or password is wrong!'
@@ -78,7 +81,7 @@ module.exports = {
                         email: req.body.email
                     }
                 })
-                .then(result => {
+                .then(async result => {
                     if (result.length > 0) {
                         res.send({
                             message: 'Email have been used!'
@@ -86,13 +89,15 @@ module.exports = {
 
                         return null
                     } else {
+                        const password = await hashPassword(req.body.password)
+
                         Users
                             .create({
                                 id: null,
                                 firstName: req.body.firstName,
                                 lastName: req.body.lastName,
                                 email: req.body.email,
-                                password: req.body.password,
+                                password: password,
                                 createdAt: null,
                                 updatedAt: null
                             })

@@ -15,18 +15,18 @@ module.exports = {
         operatorAliases: false
     },
     test: {
-        username: 'root',
-        password: null,
+        username: DATABASE_USER,
+        password: DATABASE_PASSWORD,
         database: 'database_test',
-        host: '127.0.0.1',
+        host: DATABASE_HOST,
         dialect: 'mysql',
         operatorAliases: false
     },
     production: {
-        username: 'root',
-        password: null,
+        username: DATABASE_USER,
+        password: DATABASE_PASSWORD,
         database: 'database_production',
-        host: '127.0.0.1',
+        host: DATABASE_HOST,
         dialect: 'mysql',
         operatorAliases: false
     }
